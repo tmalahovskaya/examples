@@ -1,0 +1,474 @@
+openapi: 3.0.0
+info:
+  title: The Discovery API
+  description: >-
+    The Discovery Service provides an application with details of the end-user's
+    operator. Once these details have been obtained, then the application will
+    be able to make Mobile Connect calls to the operator's endpoints. The
+    service has various methods of identifying the operator. Where possible,
+    this is done in the backgorund (without user interaction), but in some
+    situations it is necessary to ask an End-User to provide additional details.
+    In this case the Discovery Service will present an "Operator Selection User
+    Interface" which prompts the end user to enter their MSISDN or select  their
+    operator. This document explains thew different
+    [requests](https://developer.mobileconnect.io/discovery-api#discovery-requests) 
+    that are available to applications as well as specifying the details of the
+    [API](https://developer.mobileconnect.io/discovery-api#discovery-api-reference).
+  version: 1.0.0
+tags:
+  - name: User selected MCC/MNC with GET
+    description: ''
+  - name: User selected MCC/MNC with POST
+    description: ''
+  - name: 'User selected MNC/MCC, ignoring cookies'
+    description: ''
+  - name: Using MSISDN POST
+    description: ''
+  - name: MSISDN based with user interaction (HTML response)
+    description: ''
+  - name: MSISDN based with user interaction (JSON response)
+    description: ''
+  - name: MSISDN based with user interaction and errors returned to the application
+    description: ''
+  - name: Developer app sends MSISDN
+    description: ''
+  - name: IP based using mobile data
+    description: ''
+servers:
+  - url: 'https://discovery.sandbox.mobileconnect.io'
+host: 'https://github.com/tmalahovskaya/examples'
+paths:
+  '/v2/discovery{?Selected-MCC,Selected-MNC}':
+    get:
+      tags:
+        - User selected MCC/MNC with GET
+      summary: >-
+        When a country and operator have been selected by the User via the
+        Discovery, this is passed to the API Exchange via the Discovery API and
+        the MNOs endpoints are returned.
+      description: ''
+      operationId: ''
+      parameters:
+        - in: query
+          name: Selected-MCC
+          description: >-
+            The 3 Digit Numeric Mobile Country Code of the responce from the
+            Operator Selection WebApp.
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: Selected-MNC
+          description: >-
+            The 2 or 3 Digit Numeric Mobile Network code of the responce from
+            the Operator Selection Web App.
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: Redirect_URL
+          description: >-
+            The Redirect URL that you set when you create your application.
+            Determines where Discovery Service sends responses to your
+            OperatorSelection requests.
+          required: true
+          schema:
+            type: string
+        - in: header
+          name: Authorization
+          description: >-
+            HTTP Basic authorization to access the API. Base64 encoded string of
+            your <client_id>:<client_secret>.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: >-
+            Two cookies are set (this is default for the Discovery response,
+            unless Set-Cookies parameter is set to false in the request)."
+          $ref: 'https://github.com/tmalahovskaya/examples/blob/master/one'
+        '400':
+          description: 'The MNC, MCC or Redirect_URL is not provided.'
+        '401':
+          description: The request credentials are not valid.
+        '404':
+          description: The MCC/MNC pairing does not match any operator.
+  /v2/discovery:
+    post:
+      tags:
+        - User selected MCC/MNC with POST
+      summary: >-
+        When the country and operator have been selected by the user via the
+        Discovery UI, this is passed to the API Exchange via the Discovery API
+        and the MNOs endpoints are returned.
+      description: ''
+      operationId: ''
+      parameters:
+        - in: header
+          name: Content-Type
+          description: Content type of the returned content
+          required: true
+          schema:
+            type: string
+        - in: header
+          name: Authorization
+          description: >-
+            HTTP Basic authorization to access the API. Base64 encoded string of
+            your <client_id>:<client_secret>.
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: Redirect_URL
+          description: >-
+            The Redirect URL that you set when you create your application.
+            Determines where Discovery Service sends responses to your
+            OperatorSelection request.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: >-
+            Two cookies are set (this is default for the discovery response,
+            unless Set-Cookies parameter is set to false in the request)
+  '/v2/discovery{?Selected-MCC,Selected-MNC,Ignore-Cookies}':
+    get:
+      tags:
+        - 'User selected MNC/MCC, ignoring cookies'
+      summary: >-
+        All Discovery requests are able to make use of the Ignore-Cookies flag,
+        which is intended to make texting easier in the situation where the
+        results are likely to change.
+      description: ''
+      operationId: ''
+      parameters:
+        - in: query
+          name: Redirect_URL
+          description: >-
+            The redirect URL that you set when you create your
+            application.Determines where Discovery Service sends responses to
+            your OperatorSelection request.
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: Selected-MCC
+          description: >-
+            The 3 Digit Numeric Mobile Country Code of the response from the
+            Operator Selection WebApp.
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: Selected-MNC
+          description: >-
+            The 2 or 3 Digit Numeric Mobile Country Code of the response from
+            the Operator Selection WebApp.
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: Ignore-Cookie
+          description: The indicator that the cookies should not be saved.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+  /v2/discovery/:
+    post:
+      tags:
+        - Using MSISDN POST
+      summary: Authorization based on the mobile phone number of the User.
+      description: ''
+      operationId: ''
+      parameters:
+        - in: header
+          name: Content-type
+          description: Content type of the returned content.
+          required: true
+          schema:
+            type: string
+        - in: header
+          name: Authorization
+          summary: >-
+            Credentials issued to the Serving Operator fpr use in securing API
+            calls.
+          required: true
+          schema:
+            type: string
+        - in: header
+          name: Accept
+          description: 'Resource content tyoe, Default is application/json.'
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: Redirect_URL
+          description: ''
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: MSISDN
+          description: The user's mobile number represented in E.164 number format.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+        '202':
+          description: Redirect to Operator Selection
+        '302':
+          description: >-
+            Certain countries require that their numbers are processed at a
+            Local Discovery Node rather than the Global Discovery Service. For
+            in-country requests this process happens automatically but under
+            certain circumstances a request for these countries may arrive at
+            the Global Discovery Node. If this happens then an HTTP:302 response
+            will be returned and the request will be redirected towards the
+            appropriate Local Discovery Node.
+        '400':
+          description: 'The request is invalid. Either a header, query parameter is invalid.'
+        '401':
+          description: The request needs a valid session or valid credentials.
+        '404':
+          description: Could not find your operator based on the MSISDN supplied.
+  '/v2/discovery{?Redirect_URL}':
+    get:
+      tags:
+        - MSISDN based with user interaction (HTML response)
+      summary: >-
+        A MSISDN based discovery flow requires the user to be redirected to a
+        Mobile Connect page served by the Discovery service which permits the
+        user to enter their MSISDN or select their Operator. The first stage is
+        to make the initial request, which will return a 302 response. If the
+        request is to be made outside the browser, it is possible to use the
+        JSON respnse version of this call. The response is redirected back to
+        the application's Redirect_URL by the Discovery service, again via a 302
+        reponse. URL queries are added for the mcc_mnc (a string cintaining the
+        Identified-MCC and the Identified-MNC values. The response may also
+        contain a subscriber_id which can be used in OIDC requests si that the
+        user does not have to re-type their MSISDN. Upon receiving the request
+        to the redirect to the redirect URL, the mcc_mnc pair can be used with a
+        basic discovery request to get the OIDC API details for the selected
+        operator.)
+      description: ''
+      operationId: ''
+      parameters:
+        - in: query
+          name: Redirect_URL
+          description: >-
+            The Redirect URL that you set when you create your application.
+            Determines where Discovery Service sends responses to your
+            OperatorSelection request.
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: >-
+            The first 302 response redirects the User to the web-based Discovery
+            Service. At this point the user will interact with the Discovery
+            Service so that the Operator can be identified.      
+             Once the user interaction is complete then the Discovery Service will respond back with the operator's MCC and MNC and optionally the encrypted MSISDN (in the form of subscriber_id). 
+             Using the MCC and MNC sent back in the previous response the User's endpoints can then be retrieved using a variant of User selected MCC/MNC with GET or User selected MCC/MNC with POST. Note that we have used Identified here, not selected.
+        '401':
+          description: >-
+            If 'the session_id' is invalid then the request fails and all
+            cookies are reset.
+  '/v2/discovery{?Redirect_URL}/':
+    get:
+      tags:
+        - MSISDN based with user interaction (JSON response)
+      summary: >-
+        By adding an Accept header to the initial request, the user interaction
+        details will be returned as a JSON structure rather than as an HTML 302
+        response.
+      description: ''
+      operationId: ''
+      parameters:
+        - in: header
+          name: Authorization
+          description: >-
+            HTTP Basic authorization to access the API. Base64 encoded string of
+            your <client_id>:<client_secret>.
+          required: true
+          schema:
+            type: string
+        - in: header
+          name: Accept
+          description: >-
+            Indicates the content type required for the response. text/html can
+            be used on the request with OperatorSelection request to get an HTML
+            response. For all other requests, always default to
+            application/json. Accepted values: application/json; text/html
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: Redirect_URL
+          description: >-
+            The Redirect URL that you set when you create your application. 
+            Determines where Discovery Service sends reponses to your
+            OperatorSelection request.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+  '/v2/discovery{?Redirect_URL,X-Redirect}':
+    get:
+      tags:
+        - >-
+          MSISDN based with user interaction and errors returned to the
+          application
+      summary: >-
+        A user interaction-based Discovery flow requires the User to be
+        redirected to a Mobile Connect web-page served by the Discovery Service,
+        which permits them to enter their MSISDN or select their operator.
+        Normally any errors messages generated by the Discovery User Interface
+        are displayed withis this UI. It is posible to have any errors returned
+        as standard JSON errors rather displayed in the discovery interface. To
+        enable these JSON error messages use the X-Redirect parameter in your
+        initial request.
+      description: ''
+      operationId: ''
+      parameters:
+        - in: header
+          name: Authorization
+          description: >-
+            HTTP Basic authorization to access the API. Base64 encoded string of
+            your <client_id>:<client_secret>
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: Redirect_URL
+          description: >-
+            The Redirect URL that you set whne you create your application.
+            Determines where Discovery Service sends responses to your
+            OperatorSelection request.
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: Redirect_URL
+          description: >-
+            The Redirect URL that you set when you create your application.
+            Determines where Discovery Service sends responses to your
+            OperatorSelection request.
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: X-Redirect
+          description: >-
+            Indicates if the error responses in the Вiscovery UI flow should be
+            returned as JSON errors rather than handled within the Вiscovery UI.
+            This allows the requesting application to manage the user error
+            flow.
+          required: true
+          schema:
+            type: string
+      responses:
+        '404':
+          description: The MCC/MNC pairing does not match an operator.
+  /v2/discovery//:
+    post:
+      tags:
+        - Developer app sends MSISDN
+      summary: ''
+      description: ''
+      operationId: ''
+      parameters:
+        - in: header
+          name: Authorization
+          description: >-
+            HTTP Basic authorization to access the API. Base64 encoded string of
+            your <client_id>:<client_secret>.
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: Redirect_URL
+          description: >-
+            The Redirect URL that you set when you create your application.
+            Determines where Discovery Service sends responses to your
+            OperatorSelection request.
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: MSISDN
+          description: User's mobile number in E.164 number format.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: >-
+            Direct discovery reponse with cookies set. Also note the
+            subscriber_id parameter in the response payload.
+  /v2/discovery?Redirect_URL:
+    get:
+      tags:
+        - IP based using mobile data
+      summary: >-
+        In cases when there is a server/client application and the server is
+        making the Discovery request, the server application can pick up the
+        clients IP address and use it in the request. This will allow the
+        Discovery Service to attempt to identify User's operator using their IP
+        address. The Using-Mobile-Data header should also be set to 'true’.This
+        functionality can be tested with the Sandbox using the test operator IP
+        addresses defined here. NOTE: If this is used with other parameters
+        (such as Selected-MCC/MNC) then this will be ignored.
+      description: ''
+      operationId: ''
+      parameters:
+        - in: header
+          name: Accept
+          description: 'Resource content type, default is application/json.'
+          required: true
+          schema:
+            type: string
+        - in: header
+          name: X-Using-Mobile-Data
+          description: Is used to collect the mobile network information.
+          required: true
+          schema:
+            type: boolean
+        - in: header
+          name: X-Source-IP
+          description: >-
+            The current IPv4 address of the device in the network. SP server
+            retrieves the client IP and adds X-Source-IP in the header if
+            discovery request.
+          required: true
+          schema:
+            type: string
+            format: ipv4
+        - in: query
+          name: Local-Client-IP
+          description: Local IPv4 address of the device in the network.
+          schema:
+            type: string
+        - in: query
+          name: Redirect_URL
+          description: Redirect_URL of the app once the discovery is completed.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+        '202':
+          description: Redirect to Operator Selection
+        '400':
+          description: 'The request is invalid. Either a header, query parameter is invalid.'
+        '401':
+          description: The request needs a valid session or valid credentials.
