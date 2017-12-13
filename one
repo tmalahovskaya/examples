@@ -1,0 +1,50 @@
+{
+  "subscriber_id": null,
+  "ttl": 1488452073,
+  "response": {
+    "serving_operator": "Example Operator B",
+    "client_secret": "YWIyNmQyYmQtMDMxMi00MTg4LWJjMDgtYTUyN2ZhMWMwZDIyOm9wZXJhdG9yLWI=",
+    "country": "US",
+    "apis": {
+      "operatorid": {
+        "link": [
+          {
+            "rel": "authorization",
+            "href": "https://operator-b.sandbox.mobileconnect.io/oidc/authorize"
+          },
+          {
+            "rel": "token",
+            "href": "https://operator-b.sandbox.mobileconnect.io/oidc/accesstoken"
+          },
+          {
+            "rel": "userinfo",
+            "href": "https://operator-b.sandbox.mobileconnect.io/oidc/userinfo"
+          },
+          {
+            "rel": "tokenrevoke",
+            "href": "https://operator-b.sandbox.mobileconnect.io/oidc/revoke"
+          },
+          {
+            "rel": "premiuminfo",
+            "href": "https://operator-b.sandbox.mobileconnect.io/oidc/premiuminfo"
+          },
+          {
+            "rel": "scope",
+            "href": "openid profile email"
+          },
+          {
+            "rel": "openid-configuration",
+            "href": "https://operator-b.sandbox.mobileconnect.io/.well-known/openid-configuration"
+          },
+          {
+            "rel": "jwks",
+            "href": "https://operator-b.sandbox.mobileconnect.io/oidc/operator-b/jwks.json"
+          }
+        ]
+      }
+    },
+    "currency": "USD",
+    "client_name": "TestApp",
+    "client_id": "MDQ4MTZmMWYtOTAwMi00YjczLTkyNDAtZWQ2YjZhNWZhYjZmOm9wZXJhdG9yLWI="
+  }
+}
